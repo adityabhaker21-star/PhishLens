@@ -154,6 +154,7 @@
     function log(msg) {
       logBox.textContent = `[${new Date().toLocaleTimeString()}] ` + msg + '\n' + logBox.textContent;
     }
+    window.log = log;
 
     function testSafe() {
       sessionStorage.removeItem('phishlens_bypassed_' + location.hostname);

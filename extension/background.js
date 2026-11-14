@@ -318,5 +318,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message.action === 'GO_BACK_TO_SAFETY') {
+    (async () => {
+      if (!tabId) {
+        sendResponse({ success: false });
+        return;
+      }
+      try {
+        if (chrome.tabs && chrome.tabs.goBack) {
+          await chrome.tabs.goBack(tabId);
+        } else {
+          await chrome.tabs.update(tabId, { url: 'about:blank' });
+        }
+      } catch (err) {
+        // If cannot go back (e.g. no back history or security block), redirect tab to about:blank
+        try {
+          await chrome.tabs.update(tabId, { url: 'about:blank' });
+        } catch (e) {
+          console.debug('[PhishLens SW] Navigation to safety failed:', e);
+        }
+      }
+      sendResponse({ success: true });
+    })();
+    return true;
+  }
+
   return false;
 });

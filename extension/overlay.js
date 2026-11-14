@@ -542,12 +542,60 @@
     const safetyBtn = backdrop.querySelector('#phishlens-btn-safety');
     const continueBtn = backdrop.querySelector('#phishlens-btn-continue');
 
-    safetyBtn.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = 'about:blank';
+    safetyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Check if running on test_preview.html or explicitly in test mode
+      const isTestEnv = window.__phishLensIsTest ||
+                        window.location.href.includes('test_preview.html') ||
+                        window.location.protocol === 'file:';
+
+      if (isTestEnv) {
+        console.log('[PhishLens] "Go back to safety" clicked in test environment. Dismissing overlay.');
+        hide();
+
+        // Show friendly in-page feedback for test bench
+        const toast = document.createElement('div');
+        toast.id = 'phishlens-safety-toast';
+        toast.style.cssText = 'position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #38bdf8; border: 1px solid #0284c7; padding: 12px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 2147483647; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-family: sans-serif;';
+        toast.innerHTML = '&#10003; "Go back to safety" clicked &mdash; on live sites, this returns to previous page or navigates to safety.';
+        document.body.appendChild(toast);
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+
+        if (typeof window.log === 'function') {
+          window.log('"Go back to safety" action executed successfully.');
+        }
+        return;
       }
+
+      // Live environment: hide modal immediately so user sees instant response
+      hide();
+
+      // Ask extension background worker to navigate or redirect tab
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        try {
+          chrome.runtime.sendMessage({ action: 'GO_BACK_TO_SAFETY' });
+        } catch (err) {
+          console.debug('[PhishLens] Extension message failed:', err);
+        }
+      }
+
+      // Attempt standard browser history navigation
+      if (window.history.length > 1) {
+        try {
+          window.history.back();
+        } catch (err) {}
+      }
+
+      // Safety fallback: if history.back did not navigate away (e.g. fresh tab or restricted chrome://), redirect to about:blank
+      setTimeout(() => {
+        try {
+          window.location.replace('about:blank');
+        } catch (e) {
+          window.location.href = 'about:blank';
+        }
+      }, 250);
     });
 
     continueBtn.addEventListener('click', () => {
@@ -640,6 +688,7 @@
 
   // Testing helper
   function test(score = 87) {
+    window.__phishLensIsTest = true;
     const mockScan = {
       scan_id: 'test_' + Date.now(),
       score: score,
