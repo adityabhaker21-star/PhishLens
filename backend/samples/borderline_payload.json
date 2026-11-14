@@ -1,0 +1,18 @@
+{
+  "url": "http://borderline.test:8080/login",
+  "title": "Member Portal Sign In",
+  "text_snippet": "Sign in to access your member account and manage your profile settings.",
+  "forms": [
+    {
+      "action": "http://borderline.test:8080/login",
+      "has_password": true,
+      "input_names": ["email", "password"]
+    }
+  ],
+  "external_link_ratio": 0.1,
+  "favicon_url": "http://borderline.test:8080/favicon.ico",
+  "meta": {
+    "https": false,
+    "iframe_count": 0
+  }
+}

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishLens Live Scan Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-6 md:p-10">
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- Top Header -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-6">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/20">
+            P
+          </div>
+          <h1 class="text-3xl font-extrabold tracking-tight text-white">PhishLens Live Intelligence</h1>
+        </div>
+        <p class="text-slate-400 text-sm mt-1">Real-time heuristic &amp; LLM-powered phishing threat stream</p>
+      </div>
+
+      <div class="flex items-center gap-3 bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-sm">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot" id="live-indicator"></span>
+        <span class="text-slate-300 font-medium" id="status-label">Monitoring Local Port 8000</span>
+      </div>
+    </header>
+
+    <!-- Top Stats Counters (Large type for projector) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pages Scanned</div>
+        <div class="text-5xl font-black text-white mt-2" id="scanned-count">0</div>
+        <div class="text-xs text-slate-500 mt-2">Total password-bearing forms inspected</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="text-rose-400 text-xs font-bold uppercase tracking-wider">Threats Flagged</div>
+        <div class="text-5xl font-black text-rose-500 mt-2" id="flagged-count">0</div>
+        <div class="text-xs text-slate-500 mt-2">Pages scoring &ge; 30 (Suspicious or Danger)</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div class="text-emerald-400 text-xs font-bold uppercase tracking-wider">Safe Pages Passed</div>
+        <div class="text-5xl font-black text-emerald-400 mt-2" id="safe-count">0</div>
+        <div class="text-xs text-slate-500 mt-2">Verified zero-friction legitimate sites</div>
+      </div>
+    </div>
+
+    <!-- Live Event Feed Table -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+      <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <span>Recent Scans</span>
+          <span class="text-xs font-normal bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full" id="stream-count">0 events</span>
+        </h2>
+        <span class="text-xs text-slate-400">Click any row to expand AI explanation &amp; signal details</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-950/60 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-800">
+              <th class="py-4 px-6">Timestamp</th>
+              <th class="py-4 px-6">Target URL</th>
+              <th class="py-4 px-6 w-44">Risk Score</th>
+              <th class="py-4 px-6 w-32">Verdict</th>
+              <th class="py-4 px-6">Primary Heuristic Indicators</th>
+            </tr>
+          </thead>
+          <tbody id="events-tbody" class="divide-y divide-slate-800/60 text-sm">
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-500">
+                Awaiting scan events from Chrome extension...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:8000/events?limit=50";
+    let knownScanIds = new Set();
+    let eventsData = [];
+
+    // Fallback seed events so dashboard is never blank during demo setup
+    const SEED_EVENTS = [
+      {
+        scan_id: "demo_fake_01",
+        timestamp: new Date().toISOString(),
+        url: "http://novabank-kyc-verify.test:8080/login",
+        score: 100,
+        verdict: "danger",
+        signals: [
+          { id: "brand_mismatch", points: 30, detail: "Nova Bank keywords found but registered domain is novabank-kyc-verify.test" },
+          { id: "lookalike_domain", points: 25, detail: "Domain contains brand name within hyphenated domain" },
+          { id: "form_action_mismatch", points: 20, detail: "Password form posts to collect.test:8080/submit, not this site" },
+          { id: "new_domain", points: 15, detail: "Domain registered within the last 30 days" },
+          { id: "insecure_or_ip", points: 15, detail: "Password field hosted on insecure plain HTTP" },
+          { id: "urgency_language", points: 10, detail: "Urgent wording detected: KYC expires in 24 hours" }
+        ],
+        explanation: {
+          verdict: "phishing",
+          confidence: 0.99,
+          reasons: [
+            "Brand mismatch on a newly registered lookalike domain.",
+            "Password form submits credentials to an external unauthorized endpoint.",
+            "Page uses urgent language demanding immediate account verification."
+          ],
+          advice: "Do not enter credentials on this page and report it immediately."
+        }
+      },
+      {
+        scan_id: "demo_borderline_01",
+        timestamp: new Date(Date.now() - 45000).toISOString(),
+        url: "http://borderline.test:8080/login",
+        score: 30,
+        verdict: "suspicious",
+        signals: [
+          { id: "new_domain", points: 15, detail: "Domain registered within the last 30 days" },
+          { id: "insecure_or_ip", points: 15, detail: "Password field hosted on insecure plain HTTP" }
+        ],
+        explanation: {
+          verdict: "suspicious",
+          confidence: 0.75,
+          reasons: [
+            "Domain was registered very recently without established reputation.",
+            "Login form runs over unencrypted HTTP protocol."
+          ],
+          advice: "Proceed with caution. Verify the destination before submitting credentials."
+        }
+      },
+      {
+        scan_id: "demo_safe_01",
+        timestamp: new Date(Date.now() - 90000).toISOString(),
+        url: "http://novabank.test:8080/login",
+        score: 15,
+        verdict: "safe",
+        signals: [
+          { id: "insecure_or_ip", points: 15, detail: "Password field hosted on plain HTTP (demo environment)" }
+        ],
+        explanation: {
+          verdict: "safe",
+          confidence: 0.95,
+          reasons: ["Domain matches official Nova Bank records."],
+          advice: "Site is legitimate."
+        }
+      }
+    ];
+
+    async function fetchEvents() {
+      try {
+        const res = await fetch(API_URL);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            updateDashboard(data);
+            document.getElementById("live-indicator").className = "inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 pulse-dot";
+            document.getElementById("status-label").textContent = "Connected to Backend (Port 8000)";
+            return;
+          }
+        }
+      } catch (e) {
+        // Fallback to seed events if backend not yet running
+      }
+
+      if (eventsData.length === 0) {
+        updateDashboard(SEED_EVENTS);
+        document.getElementById("status-label").textContent = "Standby (Showing Seed Demo Events)";
+      }
+    }
+
+    function updateDashboard(events) {
+      eventsData = events;
+      const tbody = document.getElementById("events-tbody");
+      tbody.innerHTML = "";
+
+      let total = events.length;
+      let flagged = events.filter(e => (e.score >= 30) || (e.verdict && e.verdict !== 'safe')).length;
+      let safe = total - flagged;
+
+      document.getElementById("scanned-count").textContent = total;
+      document.getElementById("flagged-count").textContent = flagged;
+      document.getElementById("safe-count").textContent = safe;
+      document.getElementById("stream-count").textContent = `${total} scans recorded`;
+
+      events.forEach((ev, idx) => {
+        const timeStr = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+        const score = Math.min(100, ev.score || 0);
+
+        let verdictBadge = "";
+        let scoreBarColor = "bg-emerald-500";
+        if (score >= 60 || ev.verdict === 'danger' || ev.verdict === 'phishing') {
+          verdictBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">DANGER</span>`;
+          scoreBarColor = "bg-rose-500";
+        } else if (score >= 30 || ev.verdict === 'suspicious') {
+          verdictBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">SUSPICIOUS</span>`;
+          scoreBarColor = "bg-amber-500";
+        } else {
+          verdictBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">SAFE</span>`;
+          scoreBarColor = "bg-emerald-500";
+        }
+
+        const topSignal = ev.signals && ev.signals.length > 0 ? ev.signals[0].detail : "No active warnings";
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-900/60 cursor-pointer transition-colors";
+        tr.onclick = () => toggleRowDetails(idx);
+
+        tr.innerHTML = `
+          <td class="py-4 px-6 text-slate-400 text-xs font-mono">${timeStr}</td>
+          <td class="py-4 px-6 font-semibold text-slate-200 max-w-xs truncate">${ev.url || "N/A"}</td>
+          <td class="py-4 px-6">
+            <div class="flex items-center gap-3">
+              <span class="font-black text-sm w-7 text-right">${score}</span>
+              <div class="flex-1 bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div class="${scoreBarColor} h-full rounded-full transition-all duration-500" style="width: ${score}%"></div>
+              </div>
+            </div>
+          </td>
+          <td class="py-4 px-6">${verdictBadge}</td>
+          <td class="py-4 px-6 text-slate-300 text-xs max-w-md truncate">${topSignal}</td>
+        `;
+
+        const detailsTr = document.createElement("tr");
+        detailsTr.id = `details-${idx}`;
+        detailsTr.className = "hidden bg-slate-950/80 border-b border-slate-800";
+        
+        const reasonsList = (ev.explanation && ev.explanation.reasons) 
+          ? ev.explanation.reasons.map(r => `<li class="flex items-start gap-2"><span class="text-rose-400 font-bold">&bull;</span><span>${r}</span></li>`).join("")
+          : (ev.signals || []).map(s => `<li class="flex items-start gap-2"><span class="text-amber-400 font-bold">&bull;</span><span>${s.detail} (${s.points} pts)</span></li>`).join("");
+
+        const adviceText = (ev.explanation && ev.explanation.advice) ? ev.explanation.advice : "Remain vigilant.";
+        const confidencePct = ev.explanation && ev.explanation.confidence ? Math.round(ev.explanation.confidence * 100) : 90;
+
+        detailsTr.innerHTML = `
+          <td colspan="5" class="p-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-3">
+                <div class="font-bold text-sm text-slate-200">AI Phishing Analysis Explanation</div>
+                <div class="text-xs bg-blue-950 text-blue-400 border border-blue-800/60 px-2.5 py-1 rounded-md font-mono">Confidence: ${confidencePct}%</div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Key Reasons Identified:</div>
+                <ul class="text-xs space-y-1.5 text-slate-300">
+                  ${reasonsList}
+                </ul>
+              </div>
+              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800/80 text-xs text-amber-300 flex items-center gap-2">
+                <span class="font-bold">Advice:</span>
+                <span>${adviceText}</span>
+              </div>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detailsTr);
+      });
+    }
+
+    function toggleRowDetails(idx) {
+      const row = document.getElementById(`details-${idx}`);
+      if (row) {
+        row.classList.toggle("hidden");
+      }
+    }
+
+    // Initial load and periodic polling every 2 seconds
+    fetchEvents();
+    setInterval(fetchEvents, 2000);
+  </script>
+</body>
+</html>
