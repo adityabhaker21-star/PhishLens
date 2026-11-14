@@ -1,0 +1,11 @@
+{
+  "url": "http://novabank-kyc-verify.xyz/auth/login",
+  "title": "Nova Bank - Secure Customer Login",
+  "text_snippet": "Dear customer, your Nova Bank account access is limited. Verify now immediately to unblock your account.",
+  "forms": [
+    {
+      "action": "http://evil-tracker.xyz/steal",
+      "method": "POST"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-11-14T00:00:00Z",
+  "domains": [
+    "malicious-phish-bank.com",
+    "evil-tracker.xyz",
+    "phishing-test-bank.xyz",
+    "secure-login-verify-now.top",
+    "novabank-scam-center.online",
+    "free-crypto-giveaway-claim.click"
+  ],
+  "urls": [
+    "http://malicious-phish-bank.com/login.php",
+    "http://evil-tracker.xyz/steal",
+    "https://phishing-test-bank.xyz/kyc-update",
+    "http://novabank-kyc-danger.xyz/auth"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "url": "http://novabank-kyc-verify.xyz/login.php",
+  "title": "Nova Bank - Account Verification Required",
+  "text_snippet": "Your account is temporarily suspended. Verify your KYC immediately within 24 hours to avoid permanent deactivation.",
+  "forms": [
+    {
+      "action": "http://evil-data-stealer.xyz/harvest.php",
+      "method": "POST"
+    }
+  ]
+}

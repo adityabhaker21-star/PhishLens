@@ -1,0 +1,11 @@
+{
+  "url": "http://secure-verify-update.top/portal",
+  "title": "Account Security Update",
+  "text_snippet": "Please review your profile settings and update your contact preferences.",
+  "forms": [
+    {
+      "action": "/portal/update",
+      "method": "POST"
+    }
+  ]
+}

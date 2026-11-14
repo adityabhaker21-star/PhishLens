@@ -1,0 +1,39 @@
+{
+  "brands": [
+    {
+      "name": "Nova Bank",
+      "domains": ["novabank.test"],
+      "keywords": ["nova bank", "novabank", "nova banking"]
+    },
+    {
+      "name": "Google",
+      "domains": ["google.com"],
+      "keywords": ["google", "gmail"]
+    },
+    {
+      "name": "PayPal",
+      "domains": ["paypal.com"],
+      "keywords": ["paypal"]
+    },
+    {
+      "name": "Amazon",
+      "domains": ["amazon.com"],
+      "keywords": ["amazon"]
+    },
+    {
+      "name": "Microsoft",
+      "domains": ["microsoft.com", "live.com", "office.com"],
+      "keywords": ["microsoft", "office365", "outlook"]
+    },
+    {
+      "name": "State Bank of India",
+      "domains": ["onlinesbi.sbi", "sbi.co.in"],
+      "keywords": ["sbi", "state bank of india", "onlinesbi"]
+    },
+    {
+      "name": "HDFC Bank",
+      "domains": ["hdfcbank.com"],
+      "keywords": ["hdfc", "hdfc bank"]
+    }
+  ]
+}

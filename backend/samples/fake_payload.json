@@ -1,0 +1,11 @@
+{
+  "url": "http://novabank-verify.xyz/auth",
+  "title": "Nova Bank - Account Alert",
+  "text_snippet": "Urgent notice: Verify your credentials now.",
+  "forms": [
+    {
+      "action": "http://evil-tracker.xyz/steal",
+      "method": "POST"
+    }
+  ]
+}
