@@ -1,0 +1,27 @@
+name: Regression tests
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/**']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r backend/req.txt
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - run: python backend/test_suite.py
+      - run: node tests/extension_regressions.cjs
+      - name: Check packaged extension matches source
+        run: |
+          python scripts/package_extension.py
+          git diff --exit-code -- PhishLens-Extension.zip

@@ -1,0 +1,19 @@
+{
+  "url": "http://novabank.test:8080/login",
+  "title": "Nova Bank - Secure Net Banking",
+  "text_snippet": "Welcome to Nova Bank Internet Banking. Enter your credentials safely. Always ensure you are on https://novabank.test.",
+  "forms": [
+    {
+      "action": "http://novabank.test:8080/login",
+      "has_password": true,
+      "input_names": ["username", "password"]
+    }
+  ],
+  "external_link_ratio": 0.0,
+  "favicon_url": "http://novabank.test:8080/favicon.ico",
+  "meta": {
+    "https": false,
+    "iframe_count": 0
+  }
+}
+

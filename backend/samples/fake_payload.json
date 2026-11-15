@@ -1,0 +1,19 @@
+{
+  "url": "http://novabank-kyc-verify.test:8080/login",
+  "title": "Nova Bank Net Banking - Urgent KYC Update",
+  "text_snippet": "Your KYC expires in 24 hours. Verify now to avoid account block. Nova Bank Net Banking Online Portal. Please enter your User ID and Password below.",
+  "forms": [
+    {
+      "action": "http://collect.test:8080/submit",
+      "has_password": true,
+      "input_names": ["userid", "password"]
+    }
+  ],
+  "external_link_ratio": 0.8,
+  "favicon_url": "http://novabank-kyc-verify.test:8080/favicon.ico",
+  "meta": {
+    "https": false,
+    "iframe_count": 0
+  }
+}
+

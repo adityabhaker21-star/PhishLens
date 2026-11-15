@@ -1,0 +1,12 @@
+{
+  "url": "https://novabank.test/login",
+  "title": "Nova Bank - Secure Personal Banking",
+  "text_snippet": "Welcome to Nova Bank. Access your online banking account safely.",
+  "forms": [
+    {
+      "action": "/api/auth/login",
+      "method": "POST"
+    }
+  ]
+}
+

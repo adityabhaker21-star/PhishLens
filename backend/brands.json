@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Nova Bank",
+    "domains": ["novabank.test"],
+    "keywords": ["nova bank", "novabank", "nova banking"]
+  },
+  {
+    "name": "State Bank of India",
+    "domains": ["onlinesbi.sbi", "sbi.co.in"],
+    "keywords": ["state bank of india", "onlinesbi", "sbi net banking", "sbi"]
+  },
+  {
+    "name": "HDFC Bank",
+    "domains": ["hdfcbank.com"],
+    "keywords": ["hdfc bank", "hdfc netbanking", "hdfc"]
+  },
+  {
+    "name": "ICICI Bank",
+    "domains": ["icicibank.com"],
+    "keywords": ["icici bank", "icici netbanking", "icici"]
+  },
+  {
+    "name": "Axis Bank",
+    "domains": ["axisbank.com", "axisbank.co.in"],
+    "keywords": ["axis bank", "axis internet banking", "axis"]
+  },
+  {
+    "name": "Paytm",
+    "domains": ["paytm.com"],
+    "keywords": ["paytm", "paytm payments bank", "paytm wallet"]
+  },
+  {
+    "name": "PhonePe",
+    "domains": ["phonepe.com"],
+    "keywords": ["phonepe", "phone pe"]
+  },
+  {
+    "name": "PayPal",
+    "domains": ["paypal.com"],
+    "keywords": ["paypal", "paypal login"]
+  },
+  {
+    "name": "Google",
+    "domains": ["google.com", "accounts.google.com", "pay.google.com"],
+    "keywords": ["google", "google pay", "gpay", "gmail", "google account"]
+  },
+  {
+    "name": "Amazon",
+    "domains": ["amazon.in", "amazon.com"],
+    "keywords": ["amazon", "amazon pay", "amazon prime"]
+  },
+  {
+    "name": "Microsoft",
+    "domains": ["microsoft.com", "live.com", "office.com", "microsoftonline.com"],
+    "keywords": ["microsoft", "office 365", "outlook", "hotmail"]
+  }
+]
+

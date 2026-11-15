@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Re:ANIME - Weekly Schedule (Simulated)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #0b0f17; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: #070a10; border-bottom: 1px solid #1e293b; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-size: 1.4rem; font-weight: 800; color: #22c55e; letter-spacing: -0.02em; }
+    .nav-actions { display: flex; gap: 1rem; align-items: center; }
+    .btn-auth { background: #22c55e; color: #000; font-weight: 700; padding: 0.5rem 1.2rem; border-radius: 6px; border: none; cursor: pointer; }
+    .btn-auth:hover { background: #16a34a; }
+
+    .main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; flex: 1; width: 100%; }
+    .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+    .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .demo-controls {
+      background: #131b2e;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .demo-controls h3 { font-size: 1rem; color: #38bdf8; margin-bottom: 0.5rem; }
+    .demo-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
+    .btn-popunder { background: #ef4444; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .btn-popunder:hover { background: #dc2626; }
+    .btn-overlay { background: #f59e0b; color: black; border: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .btn-link { color: #f87171; text-decoration: underline; font-weight: 600; margin-left: 0.5rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+    .anime-card { background: #131b2e; border: 1px solid #1e293b; border-radius: 10px; overflow: hidden; }
+    .anime-thumb { width: 100%; height: 140px; background: linear-gradient(135deg, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: 700; }
+    .anime-body { padding: 1rem; }
+    .anime-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.35rem; }
+    .anime-meta { color: #22c55e; font-size: 0.85rem; margin-bottom: 0.75rem; }
+
+    /* Modal Simulation */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 440px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+    .modal-title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+    .modal-sub { color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.25rem; }
+    .tab-row { display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; font-size: 0.9rem; }
+    .tab-active { color: #22c55e; font-weight: 700; border-bottom: 2px solid #22c55e; padding-bottom: 0.5rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.35rem; font-weight: 700; letter-spacing: 0.05em; }
+    .form-group input { width: 100%; padding: 0.7rem; background: #070a10; border: 1px solid #1e293b; border-radius: 6px; color: #fff; font-size: 0.95rem; }
+    .btn-create { width: 100%; padding: 0.85rem; background: #22c55e; color: #000; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Re:ANIME</div>
+    <div class="nav-actions">
+      <button class="btn-auth" id="btn-open-modal">Join Re:ANIME</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <h1 class="section-title">Weekly Anime Schedule</h1>
+    <p class="subtitle">Simulating streaming site with dynamic auth modal & rogue popunder triggers.</p>
+
+    <div class="demo-controls">
+      <h3>⚡ Feature 3 Security Test Suite:</h3>
+      <p style="font-size: 0.85rem; color: #94a3b8;">
+        Test how PhishLens stops rogue popunders, neutralizes clickjacking, and displays the uBlock-style interstitial.
+      </p>
+      <div class="demo-buttons">
+        <button class="btn-popunder" id="trigger-popunder">
+          💥 Trigger Rogue Popunder (Parimatch)
+        </button>
+        <button class="btn-overlay" id="inject-overlay">
+          🛡️ Inject Invisible Clickjack Overlay
+        </button>
+        <a class="btn-link" href="https://parimatchs-sport.top/redirect" target="_blank">
+          Direct Link: parimatchs-sport.top
+        </a>
+      </div>
+      <div id="status-log" style="margin-top: 0.75rem; font-size: 0.85rem; color: #4ade80;"></div>
+    </div>
+
+    <div class="grid">
+      <div class="anime-card">
+        <div class="anime-thumb">Episode 12 Live</div>
+        <div class="anime-body">
+          <div class="anime-title">Chainsaw Man S2</div>
+          <div class="anime-meta">Airing at 23:00 JST</div>
+          <button class="btn-popunder" style="width: 100%; font-size: 0.85rem;" onclick="simulateRogueClick()">
+            ▶ Play Episode (Popunder Test)
+          </button>
+        </div>
+      </div>
+
+      <div class="anime-card">
+        <div class="anime-thumb">Episode 4 Live</div>
+        <div class="anime-body">
+          <div class="anime-title">Solo Leveling S2</div>
+          <div class="anime-meta">Airing at 23:30 JST</div>
+          <button class="btn-popunder" style="width: 100%; font-size: 0.85rem;" onclick="simulateRogueClick()">
+            ▶ Play Episode (Popunder Test)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulated Auth Modal matching user's screenshot -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal-box">
+      <button class="modal-close" id="btn-close-modal">&times;</button>
+      <h2 class="modal-title">Join Re:ANIME</h2>
+      <p class="modal-sub">Start your anime journey today.</p>
+
+      <div class="tab-row">
+        <span>Sign In</span>
+        <span class="tab-active">Create Account</span>
+      </div>
+
+      <form action="/reanime-register" method="POST" id="reanime-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="text" name="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="coolweeb42" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" name="confirm_password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <button type="button" class="btn-create" id="btn-submit-account">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Modal toggle
+    const authModal = document.getElementById('auth-modal');
+    document.getElementById('btn-open-modal').addEventListener('click', () => {
+      authModal.style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      authModal.style.display = 'none';
+    });
+
+    const statusLog = document.getElementById('status-log');
+
+    // Popunder Simulator (Window.open to known rogue betting domain)
+    function simulateRogueClick() {
+      statusLog.textContent = 'Triggered rogue popunder to parimatchs-sport.top...';
+      const popunderUrl = 'https://parimatchs-sport.top/redirect?aff_c=9988&clickid=test77';
+      try {
+        window.open(popunderUrl, '_blank');
+      } catch (e) {
+        statusLog.textContent = 'window.open blocked by browser/PhishLens: ' + e.message;
+      }
+    }
+
+    document.getElementById('trigger-popunder').addEventListener('click', simulateRogueClick);
+
+    // Invisible Overlay Simulator
+    document.getElementById('inject-overlay').addEventListener('click', () => {
+      const overlay = document.createElement('a');
+      overlay.id = 'rogue-clickjack-overlay-test';
+      overlay.href = 'https://parimatchs-sport.top/redirect?aff_sub=clickjack';
+      overlay.target = '_blank';
+      overlay.style.cssText = 'position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 99999; opacity: 0; background: transparent; cursor: pointer;';
+      document.body.appendChild(overlay);
+      statusLog.textContent = 'Injected transparent full-screen overlay. PhishLens Content Script should neutralize it automatically!';
+    });
+  </script>
+</body>
+</html>
+

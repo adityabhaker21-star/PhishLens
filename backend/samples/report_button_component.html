@@ -1,0 +1,91 @@
+<!-- 
+  =============================================================================
+  PhishLens Warning Modal — Report Button & Community Reports Count Component
+  Paste this snippet directly into your Chrome Extension modal right above the
+  "Go back to safety (Recommended)" button!
+  =============================================================================
+-->
+
+<div class="community-report-strip" style="
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-family: 'Inter', -apple-system, sans-serif;
+">
+  <!-- Community Count Display -->
+  <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #991b1b;">
+    <span>🚩 Community Reports:</span>
+    <span id="phishlens-reports-count" style="background: #ef4444; color: white; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 12px;">
+      0 users
+    </span>
+  </div>
+
+  <!-- The Report Button -->
+  <button id="phishlens-report-btn" onclick="phishlensSubmitReport()" style="
+    background: #ffffff;
+    color: #dc2626;
+    border: 1.5px solid #fca5a5;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+  ">
+    <span>🚩</span> Report as Phishing
+  </button>
+</div>
+
+<script>
+  const PHISHLENS_API = "http://127.0.0.1:8000";
+
+  // 1. Function to fetch and display the live report count
+  async function phishlensLoadReports(currentUrl = window.location.href) {
+    try {
+      const res = await fetch(`${PHISHLENS_API}/report?url=${encodeURIComponent(currentUrl)}`);
+      const data = await res.json();
+      const count = data.reports_count || 0;
+      document.getElementById("phishlens-reports-count").innerText = `${count} user${count === 1 ? '' : 's'}`;
+    } catch (e) {
+      console.warn("PhishLens: Could not load reports count", e);
+    }
+  }
+
+  // 2. Function called when user clicks the "Report as Phishing" button
+  async function phishlensSubmitReport(currentUrl = window.location.href) {
+    const btn = document.getElementById("phishlens-report-btn");
+    btn.disabled = true;
+    btn.innerText = "Reporting...";
+
+    try {
+      const res = await fetch(`${PHISHLENS_API}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: currentUrl })
+      });
+      const data = await res.json();
+      
+      // Update count & change button to green success state!
+      document.getElementById("phishlens-reports-count").innerText = `${data.reports_count} user${data.reports_count === 1 ? '' : 's'}`;
+      btn.innerHTML = "<span>✅</span> Reported!";
+      btn.style.borderColor = "#10b981";
+      btn.style.color = "#10b981";
+    } catch (e) {
+      alert("Error submitting report to backend.");
+      btn.disabled = false;
+      btn.innerHTML = "<span>🚩</span> Report as Phishing";
+    }
+  }
+
+  // Call on modal load
+  // phishlensLoadReports();
+</script>
+
