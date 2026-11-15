@@ -34,3 +34,7 @@ Desktop.ini
 # Binaries
 cloudflared.exe
 
+# Review & packaging artifacts
+REVIEW.md
+*.zip
+
