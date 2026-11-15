@@ -20,7 +20,14 @@ from signals import (
     signal_urgency_language,
     signal_url_shape,
 )
-from database import init_db, save_scan, get_scan, get_recent_scans
+from database import (
+    init_db,
+    save_scan,
+    get_scan,
+    get_recent_scans,
+    record_report,
+    get_reports_count,
+)
 
 
 def run_tests():
@@ -141,6 +148,19 @@ def run_tests():
         passed += 1
     else:
         print(f"[FAIL] Test 10: SQLite Database Failed")
+
+    # Test 11: Community Reporting (Report Button Feature)
+    total += 1
+    report_test_url = "http://test-phish-counter.xyz/login"
+    initial_count = get_reports_count(report_test_url)
+    updated_count = record_report(report_test_url)
+    verified_count = get_reports_count(report_test_url)
+
+    if updated_count == initial_count + 1 and verified_count == updated_count:
+        print(f"[PASS] Test 11: Community Report Feature (Incremented to {verified_count})")
+        passed += 1
+    else:
+        print(f"[FAIL] Test 11: Community Report Failed")
 
     print("=" * 65)
     print(f"RESULTS: {passed}/{total} Tests Passed Successfully! (100% Ready)")
