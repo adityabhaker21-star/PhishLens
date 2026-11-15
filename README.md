@@ -20,7 +20,7 @@ PhishLens is a lightweight Chrome extension that intercepts phishing attacks bef
 
 ## 👥 PhishLens Team
 - **Aditya Bhaker** ([@adityabhaker21-star](https://github.com/adityabhaker21-star)) — Chrome Extension Architecture & Warning UI (Person A)
-- **Aditya Chadha** ([@AdityaRai67-beep](https://github.com/AdityaRai67-beep)) — Detection Engine, Scoring Signals & Backend API (Person B)
+- **Aditya Rai** ([@AdityaRai67-beep](https://github.com/AdityaRai67-beep)) — Detection Engine, Scoring Signals & Backend API (Person B)
 - **Suhani Agrawal** ([@suhaniagrawal21](https://github.com/suhaniagrawal21)) — AI Explanation Engine & Evaluation Benchmark (Person C)
 
 ---
